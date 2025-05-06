@@ -45,4 +45,6 @@ update: sync migrate install-pre-commit;
 .PHONY: commit
 commit:
 	git status
-	@powershell -Command "$msg = Read-Host 'Enter commit message'; git add .; git commit -m \"$msg\""
+	@read -p "Enter commit message: " msg; \
+	git add .; \
+	git commit -m "$$msg"
