@@ -42,6 +42,14 @@ test:
 update: sync migrate install-pre-commit;
 
 
+.PHONY: kubeconfig
+kubeconfig:
+	export KUBECONFIG=/c/Users/user/Downloads/django-k8-program-kubeconfig.yaml
+
+.PHONY: kube-win
+kube-win:
+	$Env:KUBECONFIG="C:\Users\user\Downloads\django-k8-program-kubeconfig.yaml"
+
 .PHONY: commit
 commit:
 	git status
