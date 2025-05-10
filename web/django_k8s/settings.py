@@ -24,9 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-wg0k_k*qzkdn2gyr)6hv=m!q760_$m_ficu7(l=8!+%erv!0=c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG = str(os.environ.get('DEBUG')) == "1"
+ENV_ALLOWED_HOST = os.environ.get("ENV_ALLOWED_HOST")
 ALLOWED_HOSTS = []
+if ENV_ALLOWED_HOST:
+    ALLOWED_HOSTS = [ ENV_ALLOWED_HOST ]
+
 
 
 # Application definition
@@ -95,6 +98,8 @@ DB_IS_AVAIL = all([
     DB_PORT
 ])
 
+DB_IGNORE_SSL=os.environ.get("DB_IGNORE_SSL") == "true"
+
 if DB_IS_AVAIL:
     DATABASES = {
         "default": {
@@ -106,6 +111,10 @@ if DB_IS_AVAIL:
             "PORT": DB_PORT,
         }
     }
+    if not DB_IGNORE_SSL:
+         DATABASES["default"]["OPTIONS"] = {
+            "sslmode": "require"
+         }
 
 
 # Password validation
