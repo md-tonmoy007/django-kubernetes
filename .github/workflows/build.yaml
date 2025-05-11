@@ -17,5 +17,22 @@ jobs:
     env:
       DJANGO_SECRET_KEY: test_secret_key_we_will_make_a_better_one
     steps:
-        -  uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Insall doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_API_TOKEN_KEY }}
+      - name: Login to DO Container Registry with short-lived creds
+        run: doctl registry login --expiry-seconds 1200
+      - name: Build container image
+        working-directory: ./web
+        run: |
+          docker build -f Dockerfile \
+            -t registry.digitalocean.com/dj-k8s-robot/django-k8s-web:latest \
+            -t registry.digitalocean.com/dj-k8s-robot/django-k8s-web:${GITHUB_SHA::7}-${GITHUB_RUN_ID::5} \
+            .
+      - name: Push image
+        run: |
+          docker push registry.digitalocean.com/dj-k8s-robot/django-k8s-web --all-tags
       
