@@ -60,7 +60,12 @@ jobs:
       - name: Wait for rollout to finish
         run: |
           kubectl rollout status deployment/django-k8s-web-deployment
-      - name: Post-build Django Commands - Migrate / Collectstatic
+      - name: Run Django Migrations and Collectstatic Jobs
         run: |
-          export SINGLE_POD_NAME=$(kubectl get pod -l app=django-k8s-web-deployment -o jsonpath="{.items[0].metadata.name}")
-          kubectl exec -it $SINGLE_POD_NAME -- bash /app/migrate.sh
+          kubectl delete job django-migrate-job --ignore-not-found
+          kubectl wait --for=delete job/django-migrate-job --timeout=60s
+          kubectl apply -f k8s/jobs/django-migrate-job.yml
+
+          echo "Waiting for job to complete..."
+          kubectl wait --for=condition=complete job/django-migrate-job --timeout=120s
+          
