@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .views import simple_view
 
 urlpatterns = [
+    path('', simple_view, name='home'),  # This will call the simple_view function when the root URL is accessed
     path('admin/', admin.site.urls),
 ]
